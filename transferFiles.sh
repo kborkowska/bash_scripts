@@ -30,16 +30,16 @@ for i in $@; do
 								 		{s="V"}}
 						  $1~/^[0-9]/ {s = s ":"$1}
 						  END {print s}' $f/user_setup.txt)
-	toSavePath="~/Dokumenty/inż/raport_graphs/${setups}"
-	cd ~/Dokumenty/inż/raport_graphs/
+	toSavePath="~/Dokumenty/inż/trap_gen_raport/raport_graphs/${setups}"
+	cd ~/Dokumenty/inż/trap_gen_raport/raport_graphs/
 	mkdir -p ${setups}
 	cd
 	awk -v t=0.000 '$1~/^[0-9]/ {t+='$frec'
 		printf("%.3f %f\n", t, $'$i')}' $f/results.txt > joint-$i-result.txt
-	mv joint-$i-result.txt ~/Dokumenty/inż/raport_graphs/${setups}
+	mv joint-$i-result.txt ~/Dokumenty/inż/trap_gen_raport/raport_graphs/${setups}
 	awk -v t=0.000 '$1~/^[0-9]/ {t+='$frec'
 		printf("%.3f %f\n", t, $'$i')}' $f/setpoints.txt > joint-$i-setpoint.txt
-	mv joint-$i-setpoint.txt ~/Dokumenty/inż/raport_graphs/${setups}
+	mv joint-$i-setpoint.txt ~/Dokumenty/inż/trap_gen_raport/raport_graphs/${setups}
 	echo "Created file for joint $i"
 	echo "--saved in ${toSavePath}--"
 done
