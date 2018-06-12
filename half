@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# half - rduce number of samples by almost half (fires and last are saved)
+
+if [ $# -lt 1 ]; then
+	echo "[ERR] No file to halved given"
+	exit
+elif [[ ! $1 =~ ".txt"$ ]]; then
+	echo "[ERR] Wrong file type"
+	exit
+fi
+
+t=(${1//./ })
+new=$t"(p)".txt
+
+awk 'NR%2 {print $0}
+	 END {print $0}' $1 > ${new}

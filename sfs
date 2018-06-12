@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#sfs - save function signature
+
+# -d option signifies that firs arguent is destination,
+# else dest is predefined
+if [ $# -gt 0 ] && [ $1 == "-d" ]; then
+	dest=$1
+	shift
+else
+	dest=`glf ~/IRPOS_results/trapezoid_generator_results/`
+fi
+
+if [ $# -lt 1 ]; then
+	echo "Wrong syntax, correct form:"
+	echo "			sfs dest fileSignature"
+	exit
+fi
+
+
+echo "$@" > ${dest}/function_signature.txt

@@ -1,0 +1,56 @@
+#!/bin/bash
+
+# ctf - concaterate trajectory file
+
+s=0
+
+if [ $# -gt 1 ]; then
+	if [ $1 == "-s" ]; then
+		s=1
+		shift
+	fi
+fi
+
+if [ $# -lt 1 ]; then
+	echo "[ERR] Number of files to concaterate not given."
+	exit
+fi
+
+directory=~/matlab_skrypty/trajectory_gen_symulators/Results/
+
+for i in `seq $1`
+do
+	modTime[i]=0
+done
+
+for file in ${directory}*
+do
+	newModTime=`stat -c %Y "$file"`
+	for i in `seq $1`
+	do
+		if [ $newModTime -gt ${modTime[i]} ]
+		then
+			z=$(( i+1 ))
+			for j in `seq $1 -1 $z`
+			do
+				f[$j]=${f[$(( j-1 ))]}
+				modTime[$j]=${modTime[$(( j-1 ))]}
+			done
+			f[$i]=$file
+			modTime[$i]=$newModTime
+			break
+		fi
+	done
+done
+
+for i in `seq $1 -1 1`
+do
+	echo "----------"
+	echo ${f[i]} ${modTime[$i]}
+	files=${files}" "${f[i]}
+done
+echo "----------"
+
+frec=0.002
+awk -v t=-0.002 '$1~/^[0-9\-]/ {t+='$frec'
+		printf("%.3f %f\n", t, $2)}' $files > ~/Dokumenty/inż/trap_gen_raport/raport_graphs/MatlabResults/trajectorys${modTime[1]}.txt

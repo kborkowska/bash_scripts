@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# cns - change name and save
+
+if [ $# -lt 1 ]; then
+	echo "[ERR] New name missing."
+	exit
+fi
+
+cd ~/Dokumenty/inż/trap_gen_raport/raport_graphs
+
+cp all.tex techs/$1.tex
+
+#mv -u all.pdf $1.pdf

@@ -1,45 +1,54 @@
 #!/bin/bash
 
-if [ $# -lt 1 ]; then
-	echo "you'ne not specified joints"
-fi
+srcDirectory=~/IRPOS_results/trapezoid_generator_results/
+destDirectory=~/Dokumenty/inż/trap_gen_raport/raport_graphs/
+matSrcDirectory=~/matlab_skrypty/trajectory_gen_symulators/Results/
 
 frec=0.002
 
+m=0
+if [ $# -gt 0 ] && [ $1 == "-m" ]; then
+	echo "[OPT] Transfering matlab files as well"
+	m=1
+	shift
+fi
+
+if [ $# -lt 1 ]; then
+	echo "[ERR] You've not specified joints"
+	exit
+fi
+
 cd 
 
-f="none"
-modTime=0
-
-for file in ~/IRPOS_results/trapezoid_generator_results/*
-do
-	newModTime=`stat -c %Y "$file"`
-	if [ $newModTime -gt $modTime ]
-	then
-		f=$file
-		modTime=$newModTime
-	fi
-done
-echo "Found latest file"
-#cd $f
+f=`glf $srcDirectory`
 
 for i in $@; do
-	setups=$(awk -v s="" 'NR==1 {if($1 == duration)
-										{s="D"}
-								 else
-								 		{s="V"}}
-						  $1~/^[0-9]/ {s = s ":"$1}
-						  END {print s}' $f/user_setup.txt)
-	toSavePath="~/Dokumenty/inż/trap_gen_raport/raport_graphs/${setups}"
-	cd ~/Dokumenty/inż/trap_gen_raport/raport_graphs/
+	setups=`more $f/function_signature.txt`
+
+	setups=${setups}`awk -v s="" '$1~/^[0-9\-]/ {s = s ":"$1}
+						 END {print s}' $f/user_setup.txt`
+	#echo $setups
+
+	cd ${destDirectory}SymulationResults/
 	mkdir -p ${setups}
 	cd
-	awk -v t=0.000 '$1~/^[0-9]/ {t+='$frec'
+
+	awk -v t=-0.002 '$1~/^[0-9\-]/ {t+='$frec'
 		printf("%.3f %f\n", t, $'$i')}' $f/results.txt > joint-$i-result.txt
-	mv joint-$i-result.txt ~/Dokumenty/inż/trap_gen_raport/raport_graphs/${setups}
-	awk -v t=0.000 '$1~/^[0-9]/ {t+='$frec'
+	mv joint-$i-result.txt ${destDirectory}SymulationResults/${setups}
+
+	awk -v t=-0.002 '$1~/^[0-9\-]/ {t+='$frec'
 		printf("%.3f %f\n", t, $'$i')}' $f/setpoints.txt > joint-$i-setpoint.txt
-	mv joint-$i-setpoint.txt ~/Dokumenty/inż/trap_gen_raport/raport_graphs/${setups}
+	mv joint-$i-setpoint.txt ${destDirectory}SymulationResults/${setups}
+
 	echo "Created file for joint $i"
-	echo "--saved in ${toSavePath}--"
+	echo "--saved in ${destDirectory}SymulationResults/${setups}--"
+
 done
+
+if [ $m -gt 0 ]
+then
+	f=`glf $matSrcDirecotry`
+	echo $matSrcDirectory
+	cp $f ${destDirectory}MatlabResults
+fi
